@@ -21,10 +21,10 @@ func (c CouponID) String() string {
 }
 
 type Coupon struct {
-	CouponID       uuid.UUID
-	Code           string
-	Discount       int
-	MinBasketValue int
+	CouponID       uuid.UUID `json:"coupon_id"`
+	Code           string    `json:"code"`
+	Discount       int       `json:"discount"`
+	MinBasketValue int       `json:"min_basket_value"`
 }
 
 func (c Coupon) String() string {

@@ -22,17 +22,9 @@ type IRepository[ID DbId, T DbEntity] interface {
 	Save(e *T) (T, error)
 }
 
-//type Repository struct {
-//	entries map[string]entity.Coupon
-//}
-
 type Repository[ID DbId, T DbEntity] struct {
 	db *gorm.DB
 }
-
-//func New() *Repository {
-//	return &Repository{}
-//}
 
 func MakeRepository[ID DbId, T DbEntity](db *gorm.DB) *Repository[ID, T] {
 	var t T
@@ -45,24 +37,11 @@ func MakeRepository[ID DbId, T DbEntity](db *gorm.DB) *Repository[ID, T] {
 	return instance
 }
 
-//func (r *Repository) FindByCode(code string) (*entity.Coupon, error) {
-//	coupon, ok := r.entries[code]
-//	if !ok {
-//		return nil, fmt.Errorf("coupon not found")
-//	}
-//	return &coupon, nil
-//}
-
-func (r *Repository[ID, T]) FindByCode(id ID) (T, error) {
+func (r *Repository[ID, T]) FindByCode(code string) (T, error) {
 	var res T
-	err := r.db.Preload(clause.Associations).First(&res, id).Error
+	err := r.db.Preload(clause.Associations).Clauses(clause.Eq{Column: "code", Value: code}).Find(&res).Error
 	return res, err
 }
-
-//func (r *Repository) Save(coupon entity.Coupon) error {
-//	r.entries[coupon.Code] = coupon
-//	return nil
-//}
 
 func (r *Repository[ID, T]) Save(e *T) (T, error) {
 	var res T

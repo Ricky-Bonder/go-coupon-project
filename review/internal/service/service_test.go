@@ -9,7 +9,7 @@ import (
 
 func TestNew(t *testing.T) {
 	type args struct {
-		repo Repository
+		repo memdb.Repository[entity.CouponID, entity.Coupon]
 	}
 	tests := []struct {
 		name string
@@ -29,19 +29,19 @@ func TestNew(t *testing.T) {
 
 func TestService_ApplyCoupon(t *testing.T) {
 	type fields struct {
-		repo Repository
+		repo memdb.Repository[entity.CouponID, entity.Coupon]
 	}
 	type args struct {
 		basket entity.Basket
 		code   string
 	}
-	tests := []struct {
+	var tests []struct {
 		name    string
 		fields  fields
 		args    args
 		wantB   *entity.Basket
 		wantErr bool
-	}{}
+	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := Service{
@@ -61,7 +61,7 @@ func TestService_ApplyCoupon(t *testing.T) {
 
 func TestService_CreateCoupon(t *testing.T) {
 	type fields struct {
-		repo Repository
+		repo memdb.Repository[entity.CouponID, entity.Coupon]
 	}
 	type args struct {
 		discount       int
@@ -82,7 +82,10 @@ func TestService_CreateCoupon(t *testing.T) {
 				repo: tt.fields.repo,
 			}
 
-			s.CreateCoupon(tt.args.discount, tt.args.code, tt.args.minBasketValue)
+			_, err := s.CreateCoupon(tt.args.discount, tt.args.code, tt.args.minBasketValue)
+			if err != nil {
+				return
+			}
 		})
 	}
 }

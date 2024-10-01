@@ -19,7 +19,7 @@ func New(repo *gorm.DB) Service {
 	}
 }
 
-func (s Service) ApplyCoupon(basket Basket, code CouponID) (b *Basket, e error) {
+func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
 	b = &basket
 	coupon, err := s.repo.FindByCode(code)
 	if err != nil {
@@ -53,7 +53,7 @@ func (s Service) CreateCoupon(discount int, code string, minBasketValue int) (Co
 	return coupon, nil
 }
 
-func (s Service) GetCoupons(codes []CouponID) ([]Coupon, error) {
+func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
 	coupons := make([]Coupon, 0, len(codes))
 	var e error = nil
 
@@ -70,4 +70,8 @@ func (s Service) GetCoupons(codes []CouponID) ([]Coupon, error) {
 	}
 
 	return coupons, e
+}
+
+func (s Service) FindByCode(code string) (Coupon, error) {
+	return s.repo.FindByCode(code)
 }

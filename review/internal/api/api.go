@@ -12,9 +12,10 @@ import (
 )
 
 type Service interface {
-	ApplyCoupon(entity.Basket, entity.CouponID) (*entity.Basket, error)
+	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
 	CreateCoupon(int, string, int) (entity.Coupon, error)
-	GetCoupons([]entity.CouponID) ([]entity.Coupon, error)
+	GetCoupons([]string) ([]entity.Coupon, error)
+	FindByCode(string) (entity.Coupon, error)
 }
 
 type Config struct {

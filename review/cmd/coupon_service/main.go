@@ -20,19 +20,9 @@ const (
 	HOURS_IN_YEAR = 24 * 365
 )
 
-////go:embed migrations/*.sql
-//var embedMigrations embed.FS
-
 func main() {
 	setupLogger()
 	dbConn := memdb.InitDb(*dbFile)
-	//sqlDb, err := dbConn.DB()
-	//if err != nil {
-	//	logger.Error(err)
-	//	panic(-1)
-	//}
-	//memdb.Migrate(sqlDb, embedMigrations)
-
 	//ctx, cancel := context.WithCancel(
 	//	context.WithValue(
 	//		context.Background(),
@@ -50,6 +40,13 @@ func main() {
 		logger.Error(err)
 	}
 	logger.Infof("Created coupon: %v", coupon)
+
+	foundCoupon, err := svc.FindByCode(coupon.Code)
+	if err != nil {
+		return
+	}
+
+	logger.Infof("Found coupon: %v", foundCoupon)
 
 	<-time.After(HOURS_IN_YEAR * time.Hour)
 	logger.Infof("Coupon service server alive for a year, closing")
