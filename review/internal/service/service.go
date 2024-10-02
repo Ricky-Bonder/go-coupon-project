@@ -25,7 +25,11 @@ func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
 	if err != nil {
 		return nil, err
 	}
-	return applyDiscountToBasket(b, coupon.Discount)
+	if b.Value < coupon.MinBasketValue {
+		return b, fmt.Errorf("basket value too small")
+	} else {
+		return applyDiscountToBasket(b, coupon.Discount)
+	}
 }
 
 func applyDiscountToBasket(basket *Basket, discount int) (b *Basket, e error) {
