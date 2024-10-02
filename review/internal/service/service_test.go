@@ -3,9 +3,14 @@ package service
 import (
 	"coupon_service/internal/repository/memdb"
 	"coupon_service/internal/service/entity"
+	"github.com/glebarez/sqlite"
+	"github.com/stretchr/testify/assert"
+	"gorm.io/gorm"
 	"reflect"
 	"testing"
 )
+
+var db, _ = gorm.Open(sqlite.Open("file::memory:?cache=shared"), &gorm.Config{})
 
 func TestNew(t *testing.T) {
 	type args struct {
@@ -16,11 +21,12 @@ func TestNew(t *testing.T) {
 		args args
 		want Service
 	}{
-		{"initialize service", args{repo: nil}, Service{repo: nil}},
+		{"initialize service", args{repo: memdb.Repository[entity.CouponID, entity.Coupon]{}},
+			Service{repo: *memdb.MakeRepository[entity.CouponID, entity.Coupon](db)}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := New(tt.args.repo); !reflect.DeepEqual(got, tt.want) {
+			if got := New(db); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("New() = %v, want %v", got, tt.want)
 			}
 		})
@@ -74,7 +80,7 @@ func TestService_CreateCoupon(t *testing.T) {
 		args   args
 		want   any
 	}{
-		{"Apply 10%", fields{memdb.New()}, args{10, "Superdiscount", 55}, nil},
+		{"Apply 10%", fields{*memdb.MakeRepository[entity.CouponID, entity.Coupon](db)}, args{10, "Superdiscount", 55}, nil},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -83,9 +89,7 @@ func TestService_CreateCoupon(t *testing.T) {
 			}
 
 			_, err := s.CreateCoupon(tt.args.discount, tt.args.code, tt.args.minBasketValue)
-			if err != nil {
-				return
-			}
+			assert.NoError(t, err)
 		})
 	}
 }

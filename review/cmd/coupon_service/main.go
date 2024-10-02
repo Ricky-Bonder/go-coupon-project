@@ -17,7 +17,7 @@ var (
 )
 
 const (
-	HOURS_IN_YEAR = 24 * 365
+	HOURS_IN_YEAR = 24 * 365 * time.Hour
 )
 
 func main() {
@@ -48,7 +48,7 @@ func main() {
 
 	logger.Infof("Found coupon: %v", foundCoupon)
 
-	<-time.After(HOURS_IN_YEAR * time.Hour)
+	<-time.After(HOURS_IN_YEAR)
 	logger.Infof("Coupon service server alive for a year, closing")
 	couponService.Close()
 }

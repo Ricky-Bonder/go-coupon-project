@@ -7,8 +7,6 @@ import (
 	"log"
 )
 
-type Config struct{}
-
 type DbId interface {
 	fmt.Stringer
 }
@@ -37,7 +35,7 @@ func MakeRepository[ID DbId, T DbEntity](db *gorm.DB) *Repository[ID, T] {
 	return instance
 }
 
-func (r *Repository[ID, T]) FindByCode(code string) (T, error) {
+func (r *Repository[ID, T]) Get(code string) (T, error) {
 	var res T
 	err := r.db.Preload(clause.Associations).Clauses(clause.Eq{Column: "code", Value: code}).Find(&res).Error
 	return res, err
