@@ -11,26 +11,28 @@ func (a *API) Apply(c *gin.Context) {
 	apiReq := ApplicationRequest{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	basket, err := a.svc.ApplyCoupon(apiReq.Basket, apiReq.Code)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
-		c.JSON(http.StatusOK, basket)
-
+		basket, err := a.svc.ApplyCoupon(apiReq.Basket, apiReq.Code)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		} else {
+			c.JSON(http.StatusOK, basket)
+		}
 	}
+
 }
 
 func (a *API) Create(c *gin.Context) {
 	apiReq := Coupon{}
 	if err := c.ShouldBindJSON(&apiReq); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-	}
-	_, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 	} else {
-		c.Status(http.StatusCreated)
+		_, err := a.svc.CreateCoupon(apiReq.Discount, apiReq.Code, apiReq.MinBasketValue)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		} else {
+			c.Status(http.StatusCreated)
+		}
 	}
 }
 
@@ -43,13 +45,13 @@ func (a *API) Get(c *gin.Context) {
 		apiReq := CouponRequest{Code: code}
 		if err := c.ShouldBindJSON(&apiReq); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		coupon, err := a.svc.GetSpecificCoupon(apiReq.Code)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		} else {
-			c.JSON(http.StatusOK, coupon)
+			coupon, err := a.svc.GetSpecificCoupon(apiReq.Code)
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			} else {
+				c.JSON(http.StatusOK, coupon)
+			}
 		}
 	}
 }
