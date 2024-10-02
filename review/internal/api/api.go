@@ -60,10 +60,10 @@ func (a API) withServer() API {
 
 func (a API) withRoutes() API {
 	apiGroup := a.MUX.Group("/api")
-	apiGroup.POST("/apply", a.Apply)
-	apiGroup.POST("/create", a.Create)
-	apiGroup.POST("/coupon/:code", a.Get)
 	apiGroup.GET("/coupon/all", a.GetAll)
+	apiGroup.POST("/coupon/:code", a.Get)
+	apiGroup.POST("/create", a.Create)
+	apiGroup.POST("/apply", a.Apply)
 	return a
 }
 
