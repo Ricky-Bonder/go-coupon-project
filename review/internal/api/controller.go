@@ -2,9 +2,9 @@ package api
 
 import (
 	. "coupon_service/internal/api/entity"
-	"net/http"
-
 	"github.com/gin-gonic/gin"
+	"log"
+	"net/http"
 )
 
 func (a *API) Apply(c *gin.Context) {
@@ -29,15 +29,30 @@ func (a *API) Create(c *gin.Context) {
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}
-	c.Status(http.StatusOK)
+	c.Status(http.StatusCreated)
 }
 
 func (a *API) Get(c *gin.Context) {
-	apiReq := CouponRequest{}
-	if err := c.ShouldBindJSON(&apiReq); err != nil {
-		return
+	code := c.Param("code")
+	if code == "" {
+		log.Println("Error parsing code")
+		c.Status(http.StatusBadRequest)
+	} else {
+		apiReq := CouponRequest{Code: code}
+		if err := c.ShouldBindJSON(&apiReq); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+		coupon, err := a.svc.GetSpecificCoupon(apiReq.Code)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		}
+		c.JSON(http.StatusOK, coupon)
 	}
-	coupons, err := a.svc.GetCoupons(apiReq.Codes)
+}
+
+func (a *API) GetAll(c *gin.Context) {
+	coupons, err := a.svc.GetCoupons()
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 	}

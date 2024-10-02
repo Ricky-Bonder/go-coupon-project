@@ -21,7 +21,7 @@ func New(repo *gorm.DB) Service {
 
 func (s Service) ApplyCoupon(basket Basket, code string) (b *Basket, e error) {
 	b = &basket
-	coupon, err := s.repo.Get(code)
+	coupon, err := s.FindByCode(code)
 	if err != nil {
 		return nil, err
 	}
@@ -53,24 +53,29 @@ func (s Service) CreateCoupon(discount int, code string, minBasketValue int) (Co
 	return coupon, nil
 }
 
-func (s Service) GetCoupons(codes []string) ([]Coupon, error) {
-	coupons := make([]Coupon, 0, len(codes))
-	var e error = nil
-
-	for idx, code := range codes {
-		coupon, err := s.repo.Get(code)
-		if err != nil {
-			if e == nil {
-				e = fmt.Errorf("code: %s, index: %d", code, idx)
-			} else {
-				e = fmt.Errorf("%w; code: %s, index: %d", e, code, idx)
-			}
-		}
-		coupons = append(coupons, coupon)
+func (s Service) GetSpecificCoupon(code string) (Coupon, error) {
+	coupon, err := s.FindByCode(code)
+	if err != nil {
+		return Coupon{}, err
 	}
-	return coupons, e
+	return coupon, nil
+}
+
+func (s Service) GetCoupons() ([]Coupon, error) {
+	coupon, err := s.repo.GetAll()
+	if err != nil {
+		return []Coupon{}, err
+	}
+	return coupon, nil
 }
 
 func (s Service) FindByCode(code string) (Coupon, error) {
-	return s.repo.Get(code)
+	coupons, err := s.repo.Get(Coupon{Code: code})
+	if err != nil {
+		return Coupon{}, err
+	}
+	if len(coupons) == 0 {
+		return Coupon{}, fmt.Errorf("coupon not found")
+	}
+	return coupons[0], nil
 }

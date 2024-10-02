@@ -14,7 +14,8 @@ import (
 type Service interface {
 	ApplyCoupon(entity.Basket, string) (*entity.Basket, error)
 	CreateCoupon(int, string, int) (entity.Coupon, error)
-	GetCoupons([]string) ([]entity.Coupon, error)
+	GetSpecificCoupon(string) (entity.Coupon, error)
+	GetCoupons() ([]entity.Coupon, error)
 	FindByCode(string) (entity.Coupon, error)
 }
 
@@ -40,7 +41,7 @@ func New[T Service](cfg Config, svc T) API {
 		MUX: r,
 		CFG: cfg,
 		svc: svc,
-	}.withServer()
+	}.withServer().withRoutes()
 }
 
 func (a API) withServer() API {
@@ -61,7 +62,8 @@ func (a API) withRoutes() API {
 	apiGroup := a.MUX.Group("/api")
 	apiGroup.POST("/apply", a.Apply)
 	apiGroup.POST("/create", a.Create)
-	apiGroup.GET("/coupons", a.Get)
+	apiGroup.POST("/coupon/:code", a.Get)
+	apiGroup.GET("/coupon/all", a.GetAll)
 	return a
 }
 

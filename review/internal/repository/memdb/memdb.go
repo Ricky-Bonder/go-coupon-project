@@ -35,9 +35,21 @@ func MakeRepository[ID DbId, T DbEntity](db *gorm.DB) *Repository[ID, T] {
 	return instance
 }
 
-func (r *Repository[ID, T]) Get(code string) (T, error) {
-	var res T
-	err := r.db.Preload(clause.Associations).Clauses(clause.Eq{Column: "code", Value: code}).Find(&res).Error
+func (r *Repository[ID, T]) Get(example T) ([]T, error) {
+	var res []T
+	err := r.db.Preload(clause.Associations).Find(&res, example).Error
+	if err != nil {
+		log.Println("Error while reading " + err.Error())
+	}
+	return res, err
+}
+
+func (r *Repository[ID, T]) GetAll() ([]T, error) {
+	var res []T
+	err := r.db.Preload(clause.Associations).Find(&res).Error
+	if err != nil {
+		log.Println("Error while reading " + err.Error())
+	}
 	return res, err
 }
 

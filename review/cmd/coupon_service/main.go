@@ -11,9 +11,11 @@ import (
 )
 
 var (
-	cfg    = config.New()
-	dbFile = flag.String("db", "test.db?_pragma=busy_timeout(5000)", "db file")
-	logger *zap.SugaredLogger
+	serverAddress = flag.String("address", "127.0.0.1", "server address")
+	serverPort    = flag.Int("port", 8080, "server port")
+	cfg           = config.New()
+	dbFile        = flag.String("db", "test.db?_pragma=busy_timeout(5000)", "db file")
+	logger        *zap.SugaredLogger
 )
 
 const (
@@ -31,6 +33,8 @@ func main() {
 	//)
 
 	svc := service.New(dbConn)
+	cfg.API.Host = *serverAddress
+	cfg.API.Port = *serverPort
 	couponService := api.New(cfg.API, svc)
 	couponService.Start()
 	logger.Infof("Starting Coupon service server")
